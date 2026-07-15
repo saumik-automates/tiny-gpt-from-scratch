@@ -63,8 +63,12 @@ def get_array_shape(arr):
     """Return the shape tuple of a NumPy array."""
     return arr.shape
 
-# Step 10 - get_array_dtype (not yet solved)
-# TODO: implement
+# Step 10 - get_array_dtype
+import numpy as np
+
+def get_array_dtype(arr):
+    """Return the dtype of a NumPy array."""
+    return arr.dtype
 
 # Step 11 - make_2d_zeros (not yet solved)
 # TODO: implement
