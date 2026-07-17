@@ -193,8 +193,12 @@ def transpose_matrix(arr):
     """Return the transpose of a 2D array."""
     return arr.T
 
-# Step 29 - sum_keepdims (not yet solved)
-# TODO: implement
+# Step 29 - sum_keepdims
+import numpy as np
+
+def sum_keepdims(arr, axis):
+    """Sum along `axis` while keeping that dimension as size 1."""
+    return np.sum(arr, axis, keepdims=True)
 
 # Step 30 - naive_softmax_1d (not yet solved)
 # TODO: implement
