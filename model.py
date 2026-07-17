@@ -132,8 +132,12 @@ def scalar_broadcast_add(arr, scalar):
     """Return a new array equal to arr with scalar added to every element."""
     return arr + scalar
 
-# Step 20 - vector_matrix_broadcast_add (not yet solved)
-# TODO: implement
+# Step 20 - vector_matrix_broadcast_add
+import numpy as np
+
+def vector_matrix_broadcast_add(matrix, vector):
+    """Add a 1D vector to each row of a 2D matrix via broadcasting."""
+    return matrix + vector.reshape(1, -1)
 
 # Step 21 - array_exp (not yet solved)
 # TODO: implement
