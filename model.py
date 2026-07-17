@@ -146,8 +146,12 @@ def array_exp(arr):
     """Return the elementwise exponential of arr."""
     return np.exp(arr)
 
-# Step 22 - array_log (not yet solved)
-# TODO: implement
+# Step 22 - array_log
+import numpy as np
+
+def array_log(arr):
+    """Return the elementwise natural log of arr (assumes arr > 0)."""
+    return np.log(arr)
 
 # Step 23 - sum_all (not yet solved)
 # TODO: implement
