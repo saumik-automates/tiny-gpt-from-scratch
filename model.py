@@ -207,8 +207,16 @@ def naive_softmax_1d(logits):
     """Compute softmax of a 1D logits vector via the direct exp/sum formula."""
     return array_exp(logits)/sum_all(array_exp(logits))
 
-# Step 31 - softmax_overflow_demo (not yet solved)
-# TODO: implement
+# Step 31 - softmax_overflow_demo
+import math
+
+def softmax_overflow_demo(large_value):
+    """Show that naive exp overflows on a large logit.
+
+    Return {'naive_exp': float, 'overflowed': bool}.
+    """
+    value = array_exp(large_value)
+    return {"naive_exp":value, "overflowed":math.isinf(value)}
 
 # Step 32 - stable_softmax_1d (not yet solved)
 # TODO: implement
