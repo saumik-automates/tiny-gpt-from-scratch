@@ -362,8 +362,15 @@ def sample_next_token(p_matrix, current_id, rng):
     next_id = rng.choice(vocab_size, p=probs)
     return next_id
 
-# Step 52 - generate_sequence (not yet solved)
-# TODO: implement
+# Step 52 - generate_sequence
+def generate_sequence(p_matrix, start_id, length, rng):
+    """Autoregressively sample `length` token ids from a bigram matrix, starting with `start_id`."""
+    sequence = [start_id]
+    for l in range(length-1):
+        next_id = sample_next_token(p_matrix, sequence[-1], rng)
+        sequence.append(next_id)
+
+    return np.array(sequence, dtype=np.int64)
 
 # Step 53 - decode_generated_sequence (not yet solved)
 # TODO: implement
