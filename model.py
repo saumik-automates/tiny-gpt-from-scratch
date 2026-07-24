@@ -319,8 +319,14 @@ def allocate_count_matrix(vocab_size):
     """Allocate a (V, V) integer zero matrix for bigram counts."""
     return np.int64(make_2d_zeros(vocab_size, vocab_size))
 
-# Step 46 - loop_fill_counts (not yet solved)
-# TODO: implement
+# Step 46 - loop_fill_counts
+import numpy as np
+
+def loop_fill_counts(n_matrix, data):
+    """Increment n_matrix[curr, next] for every consecutive pair in data."""
+    for t in range(0, len(data)-1):
+        n_matrix[data[t], data[t+1]] += 1
+    return n_matrix
 
 # Step 47 - vectorize_counts_add_at (not yet solved)
 # TODO: implement
