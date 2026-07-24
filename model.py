@@ -372,8 +372,10 @@ def generate_sequence(p_matrix, start_id, length, rng):
 
     return np.array(sequence, dtype=np.int64)
 
-# Step 53 - decode_generated_sequence (not yet solved)
-# TODO: implement
+# Step 53 - decode_generated_sequence
+def decode_generated_sequence(ids, itos):
+    """Decode a generated 1D array/list of token ids into a string via itos."""
+    return "".join([itos[id_] for id_ in ids])
 
 # Step 54 - log_prob_of_pair (not yet solved)
 # TODO: implement
