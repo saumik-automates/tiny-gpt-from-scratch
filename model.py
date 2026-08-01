@@ -390,8 +390,9 @@ def sum_negative_log_probs(p_matrix, data):
 
     return sum_val
 
-# Step 56 - average_nll (not yet solved)
-# TODO: implement
+# Step 56 - average_nll
+def average_nll(p_matrix, data):
+    return sum_negative_log_probs(p_matrix, data)/(len(data)-1)
 
 # Step 57 - initialize_w_random (not yet solved)
 # TODO: implement
