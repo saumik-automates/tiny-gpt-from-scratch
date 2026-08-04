@@ -459,8 +459,27 @@ def cross_entropy_loss(probs, targets):
     """Mean negative log-likelihood over a batch."""
     return -sum_all(array_log(gather_correct_token_probs(probs, targets)))/len(targets)
 
-# Step 66 - derive_dlogits_on_paper (not yet solved)
-# TODO: implement
+# Step 66 - derive_dlogits_on_paper
+def derive_dlogits_on_paper():
+    """Return a string summarizing the derivation of dL/dlogits for mean cross-entropy."""
+    return """Derivation of the Cross-Entropy Loss Gradient w.r.t. Logits
+===========================================================
+1. Definitions:
+   - Batch size: B, Vocabulary size: V
+   - Logits for sample i: z_i in R^V
+   - Softmax probabilities: p_i = softmax(z_i), where p_{i,j} = exp(z_{i,j}) / sum_k(exp(z_{i,k}))
+   - Mean cross-entropy loss: L = -(1/B) * sum_{i=1}^B log(p_{i,y_i})
+
+2. Single-sample gradient (dL/dz_{i,j}):
+   - Case 1: j = y_i
+     d/dz_{i,y_i} [-log(p_{i,y_i})] = -1/p_{i,y_i} * p_{i,y_i} * (1 - p_{i,y_i}) = p_{i,y_i} - 1
+   - Case 2: j != y_i
+     d/dz_{i,j} [-log(p_{i,y_i})] = -1/p_{i,y_i} * (-p_{i,y_i} * p_{i,j}) = p_{i,j}
+   - Unified form: dL_i/dz_{i,j} = p_{i,j} - I[j = y_i]
+
+3. Batch average and final formula:
+   - Including the 1/B averaging factor across the entire batch:
+     dL/dlogits = (probs - onehot(targets)) / B"""
 
 # Step 67 - compute_dlogits (not yet solved)
 # TODO: implement
