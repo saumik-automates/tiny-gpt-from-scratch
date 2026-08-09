@@ -481,8 +481,14 @@ def derive_dlogits_on_paper():
    - Including the 1/B averaging factor across the entire batch:
      dL/dlogits = (probs - onehot(targets)) / B"""
 
-# Step 67 - compute_dlogits (not yet solved)
-# TODO: implement
+# Step 67 - compute_dlogits
+import numpy as np
+
+def compute_dlogits(probs, targets):
+    """Gradient of mean cross-entropy w.r.t. logits. probs: (B,V), targets: (B,)."""
+    B = probs.shape[0]
+    probs[np.arange(B), targets] -= 1
+    return probs/B
 
 # Step 68 - derive_dw_on_paper (not yet solved)
 # TODO: implement
