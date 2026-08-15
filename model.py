@@ -581,8 +581,9 @@ def derive_linear_dw_on_paper():
 Suppose the upstream gradient dY = dL/dY has the same shape as Y.
 dL/dW = X.T @ dY"""
 
-# Step 77 - linear_backward_dx (not yet solved)
-# TODO: implement
+# Step 77 - linear_backward_dx
+def linear_backward_dx(dy, cache):
+    return dy @ cache["w"].T
 
 # Step 78 - linear_backward_dw (not yet solved)
 # TODO: implement
