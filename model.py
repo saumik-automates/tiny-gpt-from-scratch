@@ -590,11 +590,19 @@ def linear_backward_dw(dy, cache):
     """Return dL/dW for a linear layer Y = X @ W."""
     return cache["x"].T @ dy
 
-# Step 79 - bias_add_forward (not yet solved)
-# TODO: implement
+# Step 79 - bias_add_forward
+def bias_add_forward(x, b):
+    """Add bias vector b (D,) to every row of x (B, D).
 
-# Step 80 - bias_add_backward_db (not yet solved)
-# TODO: implement
+    Returns {'y': ndarray (B, D), 'cache': {'b_shape': tuple}}.
+    """
+    return {"y": vector_matrix_broadcast_add(x, b), \
+            "cache": {"b_shape": b.shape}}
+
+# Step 80 - bias_add_backward_db
+def bias_add_backward_db(dy, cache):
+    """Compute db from upstream gradient dy for y = x + b."""
+    return np.sum(dy, axis=0).reshape(-1)
 
 # Step 81 - relu_forward (not yet solved)
 # TODO: implement
