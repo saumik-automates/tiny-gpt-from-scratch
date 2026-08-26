@@ -679,8 +679,10 @@ def layernorm_backward_subtract_mean(dy, cache):
     """
     return dy - np.mean(dy, axis=-1, keepdims=True)
 
-# Step 89 - layernorm_backward_divide_std (not yet solved)
-# TODO: implement
+# Step 89 - layernorm_backward_divide_std
+def layernorm_backward_divide_std(dy, cache):
+    """Propagate dy through the divide-by-std step of LayerNorm."""
+    return dy/np.sqrt(cache["var"]+cache["eps"])
 
 # Step 90 - layernorm_backward_full (not yet solved)
 # TODO: implement
