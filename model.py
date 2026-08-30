@@ -725,8 +725,13 @@ def token_embedding_forward(token_ids, embedding_matrix):
     vocab_size = embedding_matrix.shape[0]
     return embedding_matrix[token_ids], {"token_ids": token_ids, "vocab_size": vocab_size}
 
-# Step 94 - token_embedding_backward (not yet solved)
-# TODO: implement
+# Step 94 - token_embedding_backward
+import numpy as np
+
+def token_embedding_backward(d_out, cache):
+    dE = np.zeros((cache["vocab_size"], d_out.shape[-1]))
+    np.add.at(dE, cache["token_ids"], d_out)
+    return dE
 
 # Step 95 - create_positional_embedding (not yet solved)
 # TODO: implement
