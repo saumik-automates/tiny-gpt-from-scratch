@@ -738,8 +738,12 @@ def create_positional_embedding(block_size, d_model, scale=0.02):
     """Initialize the learned positional embedding matrix P of shape (block_size, d_model)."""
     return scale_w_small(make_2d_random(block_size, d_model, None), scale)
 
-# Step 96 - slice_positional_embedding (not yet solved)
-# TODO: implement
+# Step 96 - slice_positional_embedding
+import numpy as np
+
+def slice_positional_embedding(positional_matrix, seq_len):
+    """Return the first seq_len rows of the positional embedding matrix."""
+    return positional_matrix[:seq_len]
 
 # Step 97 - add_token_and_positional_embeddings (not yet solved)
 # TODO: implement
