@@ -750,8 +750,10 @@ def add_token_and_positional_embeddings(token_emb, pos_emb):
     """Sum token embeddings (B,T,d_model) and positional embeddings (T,d_model)."""
     return token_emb + pos_emb
 
-# Step 98 - embedding_sum_backward (not yet solved)
-# TODO: implement
+# Step 98 - embedding_sum_backward
+def embedding_sum_backward(d_out):
+    """Backprop through H = token_emb + pos_emb (with broadcasting over batch)."""
+    return {"d_token_emb": d_out, "d_pos_emb": sum_axis0(d_out)}
 
 # Step 99 - create_qkv_projections (not yet solved)
 # TODO: implement
