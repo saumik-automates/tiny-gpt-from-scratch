@@ -773,8 +773,9 @@ def compute_key(x, w_k):
     """Project x through Wk to get keys K of shape (B, T, d_head)."""
     return x @ w_k
 
-# Step 102 - compute_value (not yet solved)
-# TODO: implement
+# Step 102 - compute_value
+def compute_value(x, w_v):
+    return x @ w_v
 
 # Step 103 - compute_attention_scores (not yet solved)
 # TODO: implement
