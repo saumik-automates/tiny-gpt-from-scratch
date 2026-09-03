@@ -761,8 +761,12 @@ def create_qkv_projections(d_model, d_head, scale=0.02):
             "Wk": scale_w_small(make_2d_random(d_model, d_head, 1), scale), \
             "Wv": scale_w_small(make_2d_random(d_model, d_head, 2), scale)}
 
-# Step 100 - compute_query (not yet solved)
-# TODO: implement
+# Step 100 - compute_query
+import numpy as np
+
+def compute_query(x, w_q):
+    """Project x (B, T, d_model) into queries Q (B, T, d_head) using w_q."""
+    return x @ w_q
 
 # Step 101 - compute_key (not yet solved)
 # TODO: implement
