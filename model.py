@@ -798,8 +798,12 @@ def build_causal_mask(seq_len):
     """Return a (seq_len, seq_len) boolean lower-triangular mask."""
     return np.tri(seq_len, dtype=bool)#.astype(bool)
 
-# Step 106 - apply_causal_mask (not yet solved)
-# TODO: implement
+# Step 106 - apply_causal_mask
+import numpy as np
+
+def apply_causal_mask(scaled_scores, causal_mask):
+    """Replace future positions in scaled_scores with -inf using causal_mask."""
+    return np.where(causal_mask, scaled_scores, -np.inf)
 
 # Step 107 - softmax_attention_weights (not yet solved)
 # TODO: implement
