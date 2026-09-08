@@ -233,7 +233,7 @@ import numpy as np
 
 def stable_softmax_2d_rowwise(logits):
     """Row-wise numerically stable softmax of a 2D logits array."""
-    logits_shifted = logits - max_along_axis(logits, axis=1).reshape(-1, 1)
+    logits_shifted = logits - max_along_axis(logits, axis=-1)[..., np.newaxis]
     logits_exp = array_exp(logits_shifted)
     return logits_exp/sum_keepdims(logits_exp, axis=1)
 
@@ -805,8 +805,13 @@ def apply_causal_mask(scaled_scores, causal_mask):
     """Replace future positions in scaled_scores with -inf using causal_mask."""
     return np.where(causal_mask, scaled_scores, -np.inf)
 
-# Step 107 - softmax_attention_weights (not yet solved)
-# TODO: implement
+# Step 107 - softmax_attention_weights
+import numpy as np
+
+def softmax_attention_weights(masked_scores):
+    """Row-wise stable softmax over the last axis of (B, T, T) scores."""
+    # TODO: apply numerically stable softmax along the last axis of masked_scores
+    pass
 
 # Step 108 - attention_weighted_values (not yet solved)
 # TODO: implement
