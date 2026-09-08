@@ -177,9 +177,9 @@ def sum_axis1(arr):
 # Step 26 - max_along_axis
 import numpy as np
 
-def max_along_axis(arr, axis):
+def max_along_axis(arr, axis, keepdims=False):
     """Return the maximum of arr along the given axis, with that axis removed."""
-    return np.max(arr, axis=axis)
+    return np.max(arr, axis=axis, keepdims=keepdims)
 
 # Step 27 - matmul
 import numpy as np
@@ -810,8 +810,7 @@ import numpy as np
 
 def softmax_attention_weights(masked_scores):
     """Row-wise stable softmax over the last axis of (B, T, T) scores."""
-    # TODO: apply numerically stable softmax along the last axis of masked_scores
-    pass
+    return stable_softmax_2d_rowwise(masked_scores)
 
 # Step 108 - attention_weighted_values (not yet solved)
 # TODO: implement
