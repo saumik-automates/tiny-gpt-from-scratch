@@ -812,8 +812,17 @@ def softmax_attention_weights(masked_scores):
     """Row-wise stable softmax over the last axis of (B, T, T) scores."""
     return stable_softmax_2d_rowwise(masked_scores)
 
-# Step 108 - attention_weighted_values (not yet solved)
-# TODO: implement
+# Step 108 - attention_weighted_values
+import numpy as np
+
+def attention_weighted_values(attn, v):
+    """Combine attention weights with values: out = attn @ V.
+
+    attn: (B, T, T) softmaxed attention weights
+    v:    (B, T, d_head) value vectors
+    returns: (B, T, d_head)
+    """
+    return attn @ v
 
 # Step 109 - apply_output_projection (not yet solved)
 # TODO: implement
