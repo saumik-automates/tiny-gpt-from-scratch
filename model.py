@@ -831,8 +831,12 @@ def apply_output_projection(attn_out, w_o):
     """Project attention output (B,T,d_head) through Wo (d_head,d_model)."""
     return attn_out @ w_o
 
-# Step 110 - output_projection_backward (not yet solved)
-# TODO: implement
+# Step 110 - output_projection_backward
+def output_projection_backward(d_proj, cache):
+    """Backprop through proj = attn_out @ w_o. Return {'d_attn_out', 'dw_o'}."""
+    d_attn_out = d_proj @ cache["w_o"].T
+    dw_o = np.sum(np.transpose(cache["attn_out"], axes=(0, 2, 1)) @ d_proj, axis=0)
+    return {"d_attn_out": d_attn_out, "dw_o": dw_o}
 
 # Step 111 - attention_value_backward (not yet solved)
 # TODO: implement
