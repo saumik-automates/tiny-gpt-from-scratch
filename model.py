@@ -851,8 +851,20 @@ def attention_value_backward(d_attn_out, cache):
     return {"d_attn": d_attn_out @ np.transpose(cache["v"], axes=(0, 2, 1)), \
             "d_v": np.transpose(cache["attn"], axes=(0, 2, 1)) @ d_attn_out}
 
-# Step 112 - masked_softmax_backward (not yet solved)
-# TODO: implement
+# Step 112 - masked_softmax_backward
+import numpy as np
+
+def masked_softmax_backward(d_attn, cache):
+    """Backprop through the masked row-wise softmax.
+
+    d_attn: ndarray of shape (B, T, T) -- gradient w.r.t. attention weights.
+    cache: dict with 'attn' (B,T,T) and 'causal_mask' (T,T) boolean.
+    Returns d_masked_scores of shape (B, T, T).
+    """
+    sum_attn_d_attn = np.sum(cache["attn"]*d_attn, axis=-1, keepdims=True)
+    d_scores = cache["attn"]*(d_attn - sum_attn_d_attn)
+    d_masked_scores = np.where(cache["causal_mask"], d_scores, 0.0)
+    return d_masked_scores
 
 # Step 113 - scale_scores_backward (not yet solved)
 # TODO: implement
