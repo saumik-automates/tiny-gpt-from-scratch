@@ -873,8 +873,17 @@ def scale_scores_backward(d_scaled_scores, d_head):
     """Backprop through the 1/sqrt(d_head) attention score scaling."""
     return d_scaled_scores/np.sqrt(d_head)
 
-# Step 114 - qk_scores_backward (not yet solved)
-# TODO: implement
+# Step 114 - qk_scores_backward
+import numpy as np
+
+def qk_scores_backward(d_scores, cache):
+    """Backprop through scores = Q @ K^T.
+
+    d_scores: (B, T, T)
+    cache: dict with 'q' and 'k', each (B, T, d_head)
+    returns: {'d_q': (B, T, d_head), 'd_k': (B, T, d_head)}
+    """
+    return {"d_q": d_scores @ cache["k"], "d_k": np.transpose(d_scores, axes=(0, 2, 1)) @ cache["q"]}
 
 # Step 115 - qkv_projection_backward (not yet solved)
 # TODO: implement
