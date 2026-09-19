@@ -918,8 +918,10 @@ def create_multihead_qkv_projections(d_model, scale=0.02):
     Wv = scale_w_small(make_2d_random(d_model, d_model, 2), scale)
     return {"Wq": Wq, "Wk": Wk, "Wv": Wv}
 
-# Step 118 - create_multihead_output_projection (not yet solved)
-# TODO: implement
+# Step 118 - create_multihead_output_projection
+def create_multihead_output_projection(d_model, scale=0.02):
+    """Initialize Wo of shape (d_model, d_model) for multi-head attention output projection."""
+    return scale_w_small(make_2d_random(d_model, d_model, 0), scale)
 
 # Step 119 - reshape_to_heads (not yet solved)
 # TODO: implement
