@@ -949,8 +949,12 @@ def get_multihead_sequence_length(x):
     """Return T from x of shape (B, T, d_model)."""
     return get_array_shape(x)[1]
 
-# Step 123 - compute_d_head (not yet solved)
-# TODO: implement
+# Step 123 - compute_d_head
+def compute_d_head(d_model, n_heads):
+    if d_model % n_heads != 0:
+        raise ValueError(f"n_heads = {n_heads} does not evenly divide d_model = {d_model}")
+
+    return d_model//n_heads
 
 # Step 124 - multihead_masked_softmax_scores (not yet solved)
 # TODO: implement
