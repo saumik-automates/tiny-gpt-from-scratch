@@ -1006,8 +1006,10 @@ def multihead_output_projection_forward(merged, w_out, b_out):
     out = bias_add_forward(linear_forward(merged, w_out)["y"], b_out)["y"]
     return {"out": out, "cache": {"merged": merged, "w_out": w_out}}
 
-# Step 130 - multihead_reshape_transpose_backward (not yet solved)
-# TODO: implement
+# Step 130 - multihead_reshape_transpose_backward
+def multihead_reshape_transpose_backward(d_merged, shape_info):
+    """Invert merge_heads_to_d_model to recover (B, n_heads, T, d_head) gradients."""
+    return transpose_heads_to_front(reshape_to_heads(d_merged, shape_info["n_heads"], shape_info["d_head"]))
 
 # Step 131 - ffn_linear_one_forward (not yet solved)
 # TODO: implement
