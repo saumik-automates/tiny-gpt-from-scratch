@@ -1011,8 +1011,11 @@ def multihead_reshape_transpose_backward(d_merged, shape_info):
     """Invert merge_heads_to_d_model to recover (B, n_heads, T, d_head) gradients."""
     return transpose_heads_to_front(reshape_to_heads(d_merged, shape_info["n_heads"], shape_info["d_head"]))
 
-# Step 131 - ffn_linear_one_forward (not yet solved)
-# TODO: implement
+# Step 131 - ffn_linear_one_forward
+def ffn_linear_one_forward(x, w1, b1):
+    """First FFN linear: lift (B, T, d_model) up to (B, T, d_ff) and add bias."""
+    h1 = bias_add_forward(linear_forward(x, w1)["y"], b1)["y"]
+    return {"h1": h1, "cache": {"x": x, "w1": w1}}
 
 # Step 132 - ffn_activation_forward (not yet solved)
 # TODO: implement
