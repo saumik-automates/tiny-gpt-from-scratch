@@ -1031,8 +1031,10 @@ def ffn_activation_forward(h1):
     a1 = relu_forward(h1)["y"]
     return a1, {"h1": h1}
 
-# Step 133 - ffn_linear_two_forward (not yet solved)
-# TODO: implement
+# Step 133 - ffn_linear_two_forward
+def ffn_linear_two_forward(a1, w2, b2):
+    h2 = bias_add_forward(linear_forward(a1, w2)["y"], b2)["y"]
+    return {"h2": h2, "cache": {"a1": a1, "w2":w2}}
 
 # Step 134 - ffn_backward (not yet solved)
 # TODO: implement
