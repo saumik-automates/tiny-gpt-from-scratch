@@ -1036,8 +1036,23 @@ def ffn_linear_two_forward(a1, w2, b2):
     h2 = bias_add_forward(linear_forward(a1, w2)["y"], b2)["y"]
     return {"h2": h2, "cache": {"a1": a1, "w2":w2}}
 
-# Step 134 - ffn_backward (not yet solved)
-# TODO: implement
+# Step 134 - ffn_backward
+def ffn_backward(d_out, cache):
+    """Backprop through linear2 -> ReLU -> linear1 of the FFN.
+
+    cache keys: 'x', 'w1', 'h1', 'a1', 'w2'.
+    Returns dict with keys: 'dx', 'dw1', 'db1', 'dw2', 'db2'.
+    """
+    x, w1, h1, a1, w2 = cache["x"], cache["w1"], cache["h1"], cache["a1"], cache["w2"]
+    da1 = d_out @ w2.T
+    dw2 = np.sum(np.transpose(a1, axes=(0, 2, 1)) @ d_out, axis=0)
+    db2 = np.sum(np.sum(d_out, axis=0), axis=0)
+    dh1 = np.where(h1 > 0, da1, 0)
+    dx = dh1 @ w1.T
+    dw1 = np.sum(np.transpose(x, axes=(0, 2, 1)) @ dh1, axis=0)
+    db1 = np.sum(np.sum(dh1, axis=0), axis=0)
+
+    return {"dx": dx, "dw1": dw1, "db1": db1, "dw2": dw2, "db2": db2}
 
 # Step 135 - residual_forward (not yet solved)
 # TODO: implement
