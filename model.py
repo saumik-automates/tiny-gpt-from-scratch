@@ -1054,8 +1054,10 @@ def ffn_backward(d_out, cache):
 
     return {"dx": dx, "dw1": dw1, "db1": db1, "dw2": dw2, "db2": db2}
 
-# Step 135 - residual_forward (not yet solved)
-# TODO: implement
+# Step 135 - residual_forward
+def residual_forward(x, sublayer_out):
+    """Return x + sublayer_out for a residual connection."""
+    return x + sublayer_out
 
 # Step 136 - residual_backward (not yet solved)
 # TODO: implement
