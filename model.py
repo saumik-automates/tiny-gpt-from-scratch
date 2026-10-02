@@ -1066,8 +1066,16 @@ def residual_backward(d_y):
     d_sublayer_out = d_y.copy()
     return (d_x, d_sublayer_out)
 
-# Step 137 - pre_layernorm_sublayer_forward (not yet solved)
-# TODO: implement
+# Step 137 - pre_layernorm_sublayer_forward
+def pre_layernorm_sublayer_forward(x, ln_params, sublayer_fn, sublayer_params):
+    if "eps" not in ln_params:
+        ln_params["eps"] = 1e-9
+
+    ln_out = layernorm_forward_affine(x, **ln_params)
+    sublayer_out = sublayer_fn(ln_out["y"], sublayer_params)
+    y = residual_forward(x, sublayer_out["y"])
+    cache = {"x": x, "ln_cache": ln_out["cache"], "sublayer_cache": sublayer_out["cache"]}
+    return {"y": y, "cache": cache}
 
 # Step 138 - transformer_block_forward (not yet solved)
 # TODO: implement
