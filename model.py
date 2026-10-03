@@ -1077,8 +1077,89 @@ def pre_layernorm_sublayer_forward(x, ln_params, sublayer_fn, sublayer_params):
     cache = {"x": x, "ln_cache": ln_out["cache"], "sublayer_cache": sublayer_out["cache"]}
     return {"y": y, "cache": cache}
 
-# Step 138 - transformer_block_forward (not yet solved)
-# TODO: implement
+# Step 138 - transformer_block_forward
+def transformer_block_forward(x, block_params):
+    """Run one pre-LN Transformer block forward.
+
+    Args:
+        x: ndarray of shape (B, T, d_model).
+        block_params: dict with keys 'ln1', 'attn', 'ln2', 'ffn'.
+
+    Returns:
+        dict with 'y' (B, T, d_model) and 'cache' with keys
+        'attn_branch' and 'ffn_branch'.
+    """
+    # Wrapper for the multi-head self-attention sublayer
+    def attn_wrapper(normed_x, params):
+        q = compute_query(normed_x, params["Wq"])
+        k = compute_key(normed_x, params["Wk"])
+        v = compute_value(normed_x, params["Wv"])
+
+        n_heads = get_multihead_n_heads(params)
+        T = get_multihead_sequence_length(normed_x)
+        d_model = get_array_shape(normed_x)[2]
+        d_head = compute_d_head(d_model, n_heads)
+
+        q_heads = reshape_to_heads(q, n_heads, d_head)
+        k_heads = reshape_to_heads(k, n_heads, d_head)
+        v_heads = reshape_to_heads(v, n_heads, d_head)
+
+        q_front = transpose_heads_to_front(q_heads)
+        k_front = transpose_heads_to_front(k_heads)
+        v_front = transpose_heads_to_front(v_heads)
+
+        scores = q_front @ np.transpose(k_front, axes=(0, 1, 3, 2))
+        scaled_scores = scale_attention_scores(scores, d_head)
+
+        mask = build_causal_mask(T)
+        weights = multihead_masked_softmax_scores(scaled_scores, mask)
+
+        out_front = multihead_weighted_sum(weights, v_front)
+        out_back = transpose_heads_to_back(out_front)
+        merged = merge_heads_to_d_model(out_back)
+
+        y = multihead_output_projection_forward(merged, params["Wo"], params["bo"])["out"]
+
+        cache = {
+            "x": normed_x,
+            "w_q": params["Wq"], "w_k": params["Wk"], "w_v": params["Wv"], "w_o": params["Wo"],
+            "q": q_front, "k": k_front, "v": v_front,
+            "attn": weights, "causal_mask": mask, "attn_out": merged
+        }
+        return {"y": y, "cache": cache}
+
+    
+    def ffn_wrapper(normed_x, params):
+        out1 = ffn_linear_one_forward(normed_x, params["w1"], params["b1"])
+        h1 = out1["h1"]
+        a1, _ = ffn_activation_forward(h1)
+        out2 = ffn_linear_two_forward(a1, params["w2"], params["b2"])
+
+        cache = {
+            "x": normed_x,
+            "w1": params["w1"],
+            "h1": h1,
+            "a1": a1,
+            "w2": params["w2"]
+        }
+        return {"y": out2["h2"], "cache": cache}
+
+
+    attn_branch = pre_layernorm_sublayer_forward(
+        x, block_params["ln1"], attn_wrapper, block_params["attn"]
+    )
+
+    ffn_branch = pre_layernorm_sublayer_forward(
+        attn_branch["y"], block_params["ln2"], ffn_wrapper, block_params["ffn"]
+    )
+
+    return {
+        "y": ffn_branch["y"],
+        "cache": {
+            "attn_branch": attn_branch["cache"],
+            "ffn_branch": ffn_branch["cache"]
+        }
+    }
 
 # Step 139 - transformer_block_backward (not yet solved)
 # TODO: implement
