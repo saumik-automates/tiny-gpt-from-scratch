@@ -1161,8 +1161,56 @@ def transformer_block_forward(x, block_params):
         }
     }
 
-# Step 139 - transformer_block_backward (not yet solved)
-# TODO: implement
+# Step 139 - transformer_block_backward
+def transformer_block_backward(d_y, cache, block_params):
+    """Backward pass for a pre-LN Transformer block.
+
+    Args:
+        d_y: upstream gradient w.r.t. block output, shape (B, T, D).
+        cache: dict from transformer_block_forward, with keys 'attn_branch' and 'ffn_branch'.
+        block_params: nested dict with keys 'ln1', 'attn', 'ln2', 'ffn'.
+
+    Returns:
+        (d_x, grads) where d_x has shape (B, T, D) and grads is a nested dict
+        with keys 'ln1', 'ln2', 'attn', 'ffn' mirroring block_params.
+    """
+    x = cache["attn_branch"]["x"]
+    full_cache = _complete_block_cache(x, block_params)
+
+    d_ffn_in, ffn_grads = _ffn_sublayer_backward(
+        d_y, 
+        full_cache["ffn_branch"]["sublayer_cache"], 
+        block_params["ffn"]
+    )
+
+    d_ln2_in, dgamma2, dbeta2 = layernorm_backward_affine(
+        d_ffn_in, 
+        full_cache["ffn_branch"]["ln_cache"]
+    )
+
+    d_h1 = d_y + d_ln2_in
+
+    d_attn_in, attn_grads = _attn_sublayer_backward(
+        d_h1, 
+        full_cache["attn_branch"]["sublayer_cache"], 
+        block_params["attn"]
+    )
+
+    d_ln1_in, dgamma1, dbeta1 = layernorm_backward_affine(
+        d_attn_in, 
+        full_cache["attn_branch"]["ln_cache"]
+    )
+
+    d_x = d_h1 + d_ln1_in
+
+    grads = {
+        "ln1": {"gamma": dgamma1, "beta": dbeta1},
+        "ln2": {"gamma": dgamma2, "beta": dbeta2},
+        "attn": attn_grads,
+        "ffn": ffn_grads
+    }
+
+    return d_x, grads
 
 # Step 140 - stack_transformer_blocks (not yet solved)
 # TODO: implement
