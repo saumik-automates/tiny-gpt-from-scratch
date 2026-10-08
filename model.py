@@ -1280,8 +1280,11 @@ def final_layernorm_forward(x, gamma, beta):
     out = layernorm_forward_affine(x, gamma, beta, eps)
     return out["y"], out["cache"]
 
-# Step 144 - lm_head_linear_forward (not yet solved)
-# TODO: implement
+# Step 144 - lm_head_linear_forward
+def lm_head_linear_forward(x, w_lm, b_lm):
+    """Project hidden states (B,T,d_model) to logits (B,T,vocab_size)."""
+    logits = bias_add_forward(linear_forward(x, w_lm)["y"], b_lm)["y"]
+    return {"logits": logits, "cache": {"x": x, "w_lm": w_lm}}
 
 # Step 145 - full_model_forward (not yet solved)
 # TODO: implement
