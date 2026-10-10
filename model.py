@@ -697,7 +697,7 @@ def layernorm_backward_full(dy, cache):
     dx_hat = dy * cache["gamma"]
     dx_hat_mean = np.mean(dx_hat, axis=-1, keepdims=True)
     dx_hat_x_hat_mean = np.mean(dx_hat * x_hat, axis=-1, keepdims=True)
-    std_inv = 1.0 / np.sqrt(cache["var"] + cache["eps"])
+    std_inv = 1.0 / np.sqrt(cache["var"] + cache.get("eps", 1e-5))
     result["dx"] = std_inv * (dx_hat - dx_hat_mean - x_hat * dx_hat_x_hat_mean)
     
     return result
@@ -1321,8 +1321,81 @@ def full_model_forward(x_ids, model_params):
 
     return logits, caches
 
-# Step 146 - full_model_backward (not yet solved)
-# TODO: implement
+# Step 146 - full_model_backward
+def full_model_backward(d_logits, caches, model_params):
+    """Propagate d_logits back through LM head, final LN, blocks, and embeddings.
+
+    Args:
+        d_logits: (B, T, V) gradient w.r.t. the model output
+        caches: nested dict from full_model_forward with keys
+                'emb', 'blocks', 'ln_f', 'lm_head'
+        model_params: nested dict matching the forward's parameter tree
+
+    Returns:
+        grads: nested dict mirroring model_params with keys
+               'tok_emb', 'pos_emb', 'blocks', 'ln_f': {'gamma', 'beta'},
+               'lm_head': {'w_lm', 'b_lm'}
+    """
+    x_lm = caches["lm_head"]["x"]        # Shape: (B, T, d_model)
+    w_lm = caches["lm_head"]["w_lm"]     # Shape: (d_model, V)
+
+    B, T, V = d_logits.shape
+    d_model = x_lm.shape[2]
+
+    d_logits_flat = d_logits.reshape(B * T, V)
+    x_lm_flat = x_lm.reshape(B * T, d_model)
+
+    dw_lm = x_lm_flat.T @ d_logits_flat          # Shape: (d_model, V)
+    db_lm = d_logits_flat.sum(axis=0)            # Shape: (V,)
+
+    dx_lm_flat = d_logits_flat @ w_lm.T
+    dx_lm = dx_lm_flat.reshape(B, T, d_model)    # Reshape back to (B, T, d_model)
+
+    ln_f_grads = layernorm_backward_full(dx_lm, caches["ln_f"])
+    dx_ln = ln_f_grads["dx"]
+    
+    dgamma_f = ln_f_grads["dgamma"]
+    dbeta_f = ln_f_grads["dbeta"]
+
+    # layernorm_backward_full may only sum over axis=0 (B). 
+    # For a 3D input (B, T, d_model), we must also sum over the sequence length T
+    # to collapse into the correct (d_model,) shape parameter gradients.
+    while dgamma_f.ndim > 1:
+        dgamma_f = dgamma_f.sum(axis=0)
+    while dbeta_f.ndim > 1:
+        dbeta_f = dbeta_f.sum(axis=0)
+
+    dx_blocks, blocks_grads = backward_through_all_blocks(
+        dx_ln, 
+        caches['blocks'], 
+        model_params['blocks']
+    )
+
+    emb_cache = caches['emb']
+    try:
+        token_ids = emb_cache['tok_cache']['token_ids']
+    except (KeyError, TypeError):
+        token_ids = emb_cache['token_ids']
+
+    seq_len = emb_cache.get('seq_len', token_ids.shape[1])
+    
+    # a. Positional Embeddings: Broadcast addition means we sum the gradient over the batch axis
+    d_pos_emb = np.zeros_like(model_params['pos_emb'])
+    d_pos_emb[:seq_len, :] = np.sum(dx_blocks, axis=0)
+    
+    # b. Token Embeddings: Indexed lookup means we scatter-accumulate gradients
+    d_tok_emb = np.zeros_like(model_params['tok_emb'])
+    np.add.at(d_tok_emb, token_ids, dx_blocks)
+
+    grads = {
+        "tok_emb": d_tok_emb,
+        "pos_emb": d_pos_emb,
+        "blocks": blocks_grads,
+        "ln_f": {"gamma": dgamma_f, "beta": dbeta_f},
+        "lm_head": {"w_lm": dw_lm, "b_lm": db_lm}
+    }
+    
+    return grads
 
 # Step 147 - initialize_adam_moments (not yet solved)
 # TODO: implement
