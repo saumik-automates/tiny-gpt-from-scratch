@@ -1268,7 +1268,7 @@ def backward_through_all_blocks(d_y, caches, blocks):
         grads_list[i] = grads_block
         d_y = d_x
 
-    return d_x, grads_list
+    return d_y, grads_list
 
 # Step 143 - final_layernorm_forward
 def final_layernorm_forward(x, gamma, beta):
