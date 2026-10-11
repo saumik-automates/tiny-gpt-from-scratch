@@ -1397,8 +1397,36 @@ def full_model_backward(d_logits, caches, model_params):
     
     return grads
 
-# Step 147 - initialize_adam_moments (not yet solved)
-# TODO: implement
+# Step 147 - initialize_adam_moments
+import numpy as np
+
+def initialize_adam_recursive(params):
+    m = {}
+    v = {}
+    for key, value in params.items():
+        if isinstance(value, list):
+            m_list = []
+            v_list = []
+            for entry in value:
+                m_sub, v_sub = initialize_adam_recursive(entry)
+                m_list.append(m_sub)
+                v_list.append(v_sub)
+            m[key] = m_list
+            v[key] = v_list
+        elif isinstance(value, dict):
+            m_sub, v_sub = initialize_adam_recursive(value)
+            m[key] = m_sub
+            v[key] = v_sub
+        else:
+            m[key] = np.zeros_like(value)
+            v[key] = np.zeros_like(value)
+
+    return m, v
+
+
+def initialize_adam_moments(model_params):
+    """Allocate zeroed Adam first- and second-moment buffers matching model_params."""
+    return initialize_adam_recursive(model_params)
 
 # Step 148 - initialize_adam_step_counter (not yet solved)
 # TODO: implement
