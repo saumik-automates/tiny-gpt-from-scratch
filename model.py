@@ -1445,8 +1445,10 @@ def adam_update_first_moment(m, grad, beta1):
     """Return the updated Adam first-moment estimate."""
     return elementwise_add(elementwise_multiply(beta1, m), elementwise_multiply(1-beta1, grad))
 
-# Step 151 - adam_update_second_moment (not yet solved)
-# TODO: implement
+# Step 151 - adam_update_second_moment
+def adam_update_second_moment(v_prev, grad, beta2):
+    """Update Adam's second-moment estimate v using squared gradient EMA."""
+    return beta2*v_prev + (1-beta2)*(grad*grad)
 
 # Step 152 - adam_bias_correction (not yet solved)
 # TODO: implement
