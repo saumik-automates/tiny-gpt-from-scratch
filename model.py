@@ -1450,8 +1450,12 @@ def adam_update_second_moment(v_prev, grad, beta2):
     """Update Adam's second-moment estimate v using squared gradient EMA."""
     return beta2*v_prev + (1-beta2)*(grad*grad)
 
-# Step 152 - adam_bias_correction (not yet solved)
-# TODO: implement
+# Step 152 - adam_bias_correction
+def adam_bias_correction(m, v, beta1, beta2, t):
+    """Return bias-corrected (m_hat, v_hat) for Adam at step t."""
+    m_hat = m/(1-beta1**t)
+    v_hat = v/(1-beta2**t)
+    return m_hat, v_hat
 
 # Step 153 - adam_parameter_update (not yet solved)
 # TODO: implement
