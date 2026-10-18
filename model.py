@@ -1464,8 +1464,52 @@ def adam_parameter_update(param, m_hat, v_hat, lr, eps):
     """Apply the Adam update: param - lr * m_hat / (sqrt(v_hat) + eps)."""
     return param - lr * m_hat/(np.sqrt(v_hat)+eps)
 
-# Step 154 - wire_full_training_loop (not yet solved)
-# TODO: implement
+# Step 154 - wire_full_training_loop
+def wire_full_training_loop(params, train_ids, val_ids, block_size, batch_size, n_steps, lr, betas, eps):
+    """Run the full GPT training loop for n_steps and return (updated_params, history)."""
+    rng = np.random.default_rng(0)
+    m, v = initialize_adam_moments(params)
+    t = initialize_adam_step_counter()
+    beta1, beta2 = betas
+    history = []
+
+    def apply_adam_tree(p_node, g_node, m_node, v_node, step_t):
+        if isinstance(g_node, dict):
+            for key, g_val in g_node.items():
+                if isinstance(g_val, (dict, list)):
+                    apply_adam_tree(p_node[key], g_val, m_node[key], v_node[key], step_t)
+                else:
+                    m_node[key] = adam_update_first_moment(m_node[key], g_val, beta1)
+                    v_node[key] = adam_update_second_moment(v_node[key], g_val, beta2)
+                    m_hat, v_hat = adam_bias_correction(m_node[key], v_node[key], beta1, beta2, step_t)
+                    p_node[key] = adam_parameter_update(p_node[key], m_hat, v_hat, lr, eps)
+        elif isinstance(g_node, list):
+            for idx, g_val in enumerate(g_node):
+                apply_adam_tree(p_node[idx], g_val, m_node[idx], v_node[idx], step_t)
+
+    
+    for step in range(n_steps):
+        xb, yb = get_batch(train_ids, block_size, batch_size, rng)
+        logits, caches = full_model_forward(xb, params)
+
+        B, T, V = logits.shape
+        logits_flat = logits.reshape(B * T, V)
+        targets_flat = yb.reshape(B * T)
+
+        probs_flat = logits_to_probs_rowwise(logits_flat)
+        loss = float(cross_entropy_loss(probs_flat, targets_flat))
+
+        d_logits_flat = softmax_cross_entropy_backward(probs_flat.copy(), targets_flat)
+        d_logits = d_logits_flat.reshape(B, T, V)
+
+        grads = full_model_backward(d_logits, caches, params)
+
+        t = adam_increment_step(t)
+        apply_adam_tree(params, grads, m, v, t)
+
+        history.append({"step": step, "train_loss": loss})
+
+    return params, history
 
 # Step 155 - logging_and_validation_loss (not yet solved)
 # TODO: implement
