@@ -1538,8 +1538,9 @@ def encode_prompt(prompt, stoi):
     """Encode a string prompt to an int ndarray of shape (1, T)."""
     return np.expand_dims(np.array(encode_string(prompt, stoi)), axis=0)
 
-# Step 157 - crop_context_to_block_size (not yet solved)
-# TODO: implement
+# Step 157 - crop_context_to_block_size
+def crop_context_to_block_size(context_ids, block_size):
+    return context_ids[:, -block_size:]
 
 # Step 158 - forward_to_get_logits (not yet solved)
 # TODO: implement
