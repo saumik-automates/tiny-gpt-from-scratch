@@ -1542,8 +1542,11 @@ def encode_prompt(prompt, stoi):
 def crop_context_to_block_size(context_ids, block_size):
     return context_ids[:, -block_size:]
 
-# Step 158 - forward_to_get_logits (not yet solved)
-# TODO: implement
+# Step 158 - forward_to_get_logits
+def forward_to_get_logits(params, context_ids):
+    """Run the full model forward and return only the logits tensor."""
+    logits, _ = full_model_forward(context_ids, params)
+    return logits
 
 # Step 159 - take_last_position_logits (not yet solved)
 # TODO: implement
