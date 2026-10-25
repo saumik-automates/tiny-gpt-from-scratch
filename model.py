@@ -1597,6 +1597,8 @@ def generation_loop_for_n_steps(params, prompt_ids, n_new_tokens, block_size, te
 
     return prompt_ids
 
-# Step 166 - decode_final_sequence (not yet solved)
-# TODO: implement
+# Step 166 - decode_final_sequence
+def decode_final_sequence(generated_ids, itos):
+    """Decode a (1, T) id tensor into a string using itos."""
+    return decode_ids(generated_ids[0].tolist(), itos)
 
