@@ -1584,8 +1584,18 @@ def append_token_to_sequence(context_ids, token_id):
     """Append token_id as a new final column to context_ids of shape (1, T)."""
     return np.append(context_ids, [[token_id]], axis=1)
 
-# Step 165 - generation_loop_for_n_steps (not yet solved)
-# TODO: implement
+# Step 165 - generation_loop_for_n_steps
+def generation_loop_for_n_steps(params, prompt_ids, n_new_tokens, block_size, temperature, top_k, rng):
+    """Iteratively generate n_new_tokens by repeatedly forwarding the cropped context."""
+    for _ in range(n_new_tokens):
+        prompt_ids = crop_context_to_block_size(prompt_ids, block_size)
+        logits = forward_to_get_logits(params, prompt_ids)
+        last_pos_logits = take_last_position_logits(logits)
+        probs = softmax_to_probs(top_k_filter(apply_temperature(last_pos_logits, temperature), top_k))
+        next_token_id = sample_one_token(probs, rng)
+        prompt_ids = append_token_to_sequence(prompt_ids, next_token_id)
+
+    return prompt_ids
 
 # Step 166 - decode_final_sequence (not yet solved)
 # TODO: implement
